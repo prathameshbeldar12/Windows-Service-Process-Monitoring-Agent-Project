@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}Register - SENTINEL EDR{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
+
+    <div
+        class="
+        page-enter
+        glass
+        w-full
+        max-w-md
+        border
+        border-cyan-400/20
+        rounded-2xl
+        shadow-2xl
+        "
+    >
+
+        <!-- Header -->
+        <div class="px-6 sm:px-8 pt-8 text-center">
+
+            <div
+                class="
+                w-14
+                h-14
+                mx-auto
+                rounded-xl
+                bg-cyan-400/5
+                border
+                border-cyan-400/30
+                flex
+                items-center
+                justify-center
+                "
+            >
+                <span class="material-symbols-outlined text-2xl text-cyan-400">
+                    person_add
+                </span>
+            </div>
+
+            <h1 class="mt-4 text-2xl font-bold text-cyan-400">
+                OPERATOR REGISTRATION
+            </h1>
+
+            <p class="mt-2 text-[10px] font-mono tracking-widest text-slate-500">
+                CREATE SECURE COMMAND ACCOUNT
+            </p>
+
+        </div>
+
+        <form
+            method="POST"
+            action="{% url 'register' %}"
+            class="px-6 sm:px-8 py-8 space-y-5"
+        >
+
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div>
+
+                <label
+                    for="username"
+                    class="block mb-2 text-[10px] font-mono uppercase text-slate-400"
+                >
+                    Operator Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    required
+                    autocomplete="username"
+                    placeholder="Choose username..."
+                    class="
+                    input-field
+                    w-full
+                    bg-[#070b14]
+                    border
+                    border-slate-700
+                    rounded-xl
+                    px-4
+                    py-3
+                    text-sm
+                    font-mono
+                    "
+                >
+
+            </div>
+
+            <!-- Email -->
+            <div>
+
+                <label
+                    for="email"
+                    class="block mb-2 text-[10px] font-mono uppercase text-slate-400"
+                >
+                    Security Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    required
+                    autocomplete="email"
+                    placeholder="Enter active email..."
+                    class="
+                    input-field
+                    w-full
+                    bg-[#070b14]
+                    border
+                    border-slate-700
+                    rounded-xl
+                    px-4
+                    py-3
+                    text-sm
+                    font-mono
+                    "
+                >
+
+            </div>
+
+            <!-- Password -->
+            <div>
+
+                <label
+                    for="password"
+                    class="block mb-2 text-[10px] font-mono uppercase text-slate-400"
+                >
+                    Security Key
+                </label>
+
+                <div class="relative">
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        required
+                        autocomplete="new-password"
+                        minlength="8"
+                        placeholder="Enter strong password..."
+                        class="
+                        input-field
+                        w-full
+                        bg-[#070b14]
+                        border
+                        border-slate-700
+                        rounded-xl
+                        px-4
+                        pr-12
+                        py-3
+                        text-sm
+                        font-mono
+                        "
+                    >
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('password', this)"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-cyan-400"
+                    >
+                        <span class="material-symbols-outlined text-base">
+                            visibility
+                        </span>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Confirm -->
+            <div>
+
+                <label
+                    for="confirm_password"
+                    class="block mb-2 text-[10px] font-mono uppercase text-slate-400"
+                >
+                    Confirm Security Key
+                </label>
+
+                <input
+                    type="password"
+                    name="confirm_password"
+                    id="confirm_password"
+                    required
+                    autocomplete="new-password"
+                    placeholder="Re-enter password..."
+                    class="
+                    input-field
+                    w-full
+                    bg-[#070b14]
+                    border
+                    border-slate-700
+                    rounded-xl
+                    px-4
+                    py-3
+                    text-sm
+                    font-mono
+                    "
+                >
+
+            </div>
+
+            <!-- Password strength -->
+            <div>
+
+                <div class="flex justify-between text-[9px] font-mono mb-1">
+
+                    <span class="text-slate-500">
+                        PASSWORD STRENGTH
+                    </span>
+
+                    <span id="passwordStrengthText" class="text-slate-500">
+                        WAITING
+                    </span>
+
+                </div>
+
+                <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+
+                    <div
+                        id="passwordStrength"
+                        class="h-full w-0 transition-all duration-300"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <button
+                type="submit"
+                class="
+                cyber-button
+                w-full
+                bg-cyan-400
+                hover:bg-cyan-300
+                text-[#051424]
+                py-3
+                rounded-xl
+                font-mono
+                text-xs
+                font-bold
+                tracking-wider
+                "
+            >
+                REGISTER OPERATOR
+            </button>
+
+        </form>
+
+        <div class="border-t border-slate-700/50 px-6 py-5 text-center">
+
+            <span class="text-[10px] font-mono text-slate-500">
+                ALREADY REGISTERED?
+            </span>
+
+            <a
+                href="{% url 'login' %}"
+                class="ml-1 text-[10px] font-mono text-cyan-400 hover:underline"
+            >
+                AUTHENTICATE HERE
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    const passwordInput = document.getElementById("password");
+    const strengthBar = document.getElementById("passwordStrength");
+    const strengthText = document.getElementById("passwordStrengthText");
+
+    if (passwordInput) {
+
+        passwordInput.addEventListener("input", function () {
+
+            const password = this.value;
+
+            let score = 0;
+
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            const widths = ["0%", "20%", "40%", "60%", "80%", "100%"];
+
+            strengthBar.style.width = widths[score];
+
+            const labels = [
+                "WAITING",
+                "VERY WEAK",
+                "WEAK",
+                "MEDIUM",
+                "STRONG",
+                "VERY STRONG"
+            ];
+
+            strengthText.textContent = labels[score];
+        });
+    }
+</script>
+
+{% endblock %}

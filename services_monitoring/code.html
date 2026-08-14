@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SENTINEL EDR - Services</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#bfc6de",
+                      "surface-container-highest": "#273647",
+                      "secondary-fixed": "#9cf0ff",
+                      "on-secondary-fixed-variant": "#004f58",
+                      "on-tertiary-container": "#757c92",
+                      "on-error": "#690005",
+                      "on-secondary-container": "#00616d",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary": "#293043",
+                      "surface-container-high": "#1c2b3c",
+                      "primary-fixed": "#dee1f7",
+                      "on-tertiary-fixed": "#141b2d",
+                      "tertiary-container": "#080f21",
+                      "on-primary": "#2b3040",
+                      "outline": "#909097",
+                      "inverse-surface": "#d4e4fa",
+                      "primary-container": "#0a0f1e",
+                      "on-secondary": "#00363d",
+                      "inverse-primary": "#595e70",
+                      "on-primary-fixed": "#161b2b",
+                      "on-surface-variant": "#c7c6cd",
+                      "primary": "#c2c6db",
+                      "error": "#ffb4ab",
+                      "surface": "#051424",
+                      "surface-dim": "#051424",
+                      "surface-container-lowest": "#010f1f",
+                      "surface-container-low": "#0d1c2d",
+                      "surface-bright": "#2c3a4c",
+                      "background": "#051424",
+                      "secondary-container": "#00e3fd",
+                      "on-background": "#d4e4fa",
+                      "on-primary-fixed-variant": "#414658",
+                      "outline-variant": "#46464c",
+                      "error-container": "#93000a",
+                      "surface-variant": "#273647",
+                      "tertiary-fixed": "#dbe2fb",
+                      "on-tertiary-fixed-variant": "#3f465a",
+                      "tertiary-fixed-dim": "#bfc6de",
+                      "surface-container": "#122131",
+                      "secondary-fixed-dim": "#00daf3",
+                      "surface-tint": "#c2c6db",
+                      "on-surface": "#d4e4fa",
+                      "on-secondary-fixed": "#001f24",
+                      "primary-fixed-dim": "#c2c6db",
+                      "secondary": "#bdf4ff",
+                      "on-primary-container": "#777b8e",
+                      "inverse-on-surface": "#233143"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "gutter": "16px",
+                      "margin": "24px",
+                      "base": "4px",
+                      "md": "16px",
+                      "sm": "8px",
+                      "xl": "32px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "label-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "stats-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "stats-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display": [
+                              "36px",
+                              {
+                                      "lineHeight": "44px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        /* Custom Scrollbar for dense EDR look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.surface-container'); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-variant'); 
+            border-radius: theme('borderRadius.full');
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline-variant'); 
+        }
+        
+        /* Inner bevel simulation */
+        .card-recessed {
+            border-top: 1px solid theme('colors.surface-bright');
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: theme('colors.secondary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: theme('colors.secondary-container');
+        }
+        .toggle-checkbox:checked + .toggle-label:before {
+             transform: translateX(100%);
+             background-color: theme('colors.primary-container');
+        }
+        .toggle-label {
+            width: 36px;
+            height: 20px;
+            background-color: theme('colors.surface-container-highest');
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: theme('colors.on-surface-variant');
+            border-radius: 50%;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased overflow-hidden">
+<!-- TopNavBar -->
+<nav aria-label="Top Navigation" class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-50 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant flex justify-between items-center px-lg">
+<!-- Search Bar on Left -->
+<div class="flex-1 max-w-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-[#070B14] border border-outline-variant rounded-DEFAULT py-[6px] pl-xl pr-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-secondary-container focus:ring-1 focus:ring-secondary-container/50 font-label-mono text-label-mono shadow-[0_0_8px_rgba(0,229,255,0)] focus:shadow-[0_0_8px_rgba(0,229,255,0.4)] transition-all" placeholder="Search services..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-sm">
+<button aria-label="notifications" class="p-xs text-on-surface-variant dark:text-on-surface-variant hover:text-secondary-container dark:hover:text-secondary-container transition-colors duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="account_circle" class="p-xs text-on-surface-variant dark:text-on-surface-variant hover:text-secondary-container dark:hover:text-secondary-container transition-colors duration-200">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+<!-- Hidden Brand Logo per JSON -->
+<div class="font-display text-display text-secondary-container dark:text-secondary-container hidden">SENTINEL EDR</div>
+</nav>
+<!-- SideNavBar -->
+<nav aria-label="Side Navigation" class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant flex flex-col gap-sm py-md z-40">
+<!-- Brand Header -->
+<div class="px-md mb-gutter flex items-center gap-sm">
+<div class="w-10 h-10 rounded-DEFAULT bg-surface-container-highest border border-outline-variant flex items-center justify-center shrink-0">
+<img alt="Security Analyst Avatar" class="w-6 h-6 object-contain" data-alt="A stylized, glowing neon blue shield icon representing a cybersecurity sentinel, set against a dark textured metal background. The shield has intricate, futuristic circuit board patterns etched into its surface. High contrast, minimalist cyberpunk aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqT8MiPLjikAgVWiIbMau1evLzIMwgGC5NzMzMb5e7lwpod4-ZVAkNut1x1BNLhJ3hfeu6GrxI-a3E8nCT7xOWpFEX7fOK2Ko5sX2HdaIB2UhNBeVbhtLwTFjre0P9Hk0kP03FvSF8qJPLkm17op04ikEqWqxL6G4cMHPy5-xu4SglWd9PTYNohvqASAKvDumM2PhNGScCveb01AzBiijwJwa_jsit7hV5EUvgNoy1GNnKwBOOfSJ8"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-secondary-container dark:text-secondary-container tracking-tighter">SENTINEL EDR</h1>
+<p class="font-label-mono text-label-mono text-on-surface-variant opacity-70">V0.4.2-STABLE</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col w-full">
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">dashboard</span>
+<span class="font-label-mono text-label-mono">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">memory</span>
+<span class="font-label-mono text-label-mono">Processes</span>
+</a>
+<!-- Active Tab: Services -->
+<a class="flex items-center gap-sm px-md py-sm text-secondary-container dark:text-secondary-container border-l-2 border-secondary-container bg-surface-container-highest/20 hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">settings_input_component</span>
+<span class="font-label-mono text-label-mono">Services</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">notifications_active</span>
+<span class="font-label-mono text-label-mono">Alerts</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">monitor_heart</span>
+<span class="font-label-mono text-label-mono">System Health</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">list_alt</span>
+<span class="font-label-mono text-label-mono">Event Logs</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">security</span>
+<span class="font-label-mono text-label-mono">IOC Management</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">assessment</span>
+<span class="font-label-mono text-label-mono">Reports</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">analytics</span>
+<span class="font-label-mono text-label-mono">Analytics</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">manage_search</span>
+<span class="font-label-mono text-label-mono">Investigation</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors duration-200 group mt-auto" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-secondary-container transition-colors">settings</span>
+<span class="font-label-mono text-label-mono">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-16 p-gutter h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden">
+<div class="flex justify-between items-end mb-margin">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Service Control Manager</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Monitor and control Windows background services.</p>
+</div>
+<!-- Filters & Actions -->
+<div class="flex gap-sm">
+<button class="h-8 px-md border border-secondary-container text-secondary-container bg-transparent rounded-DEFAULT font-label-mono text-label-mono hover:bg-secondary-container/10 transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+                    Filter
+                </button>
+<button class="h-8 px-md border border-outline-variant text-on-surface bg-surface-container-highest rounded-DEFAULT font-label-mono text-label-mono hover:border-on-surface-variant transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+                    Refresh
+                </button>
+</div>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Left Col: Services List (Takes up 8 cols) -->
+<div class="col-span-12 xl:col-span-8 flex flex-col gap-gutter">
+<!-- Data Table Card -->
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT card-recessed flex-1 flex flex-col">
+<div class="px-md py-sm border-b border-outline-variant flex justify-between items-center bg-[#070B14]">
+<h3 class="font-label-mono text-label-mono text-on-surface">ALL SERVICES (142)</h3>
+<div class="text-on-surface-variant font-label-mono text-[10px]">SORT BY: NAME</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-highest text-on-surface-variant font-label-mono text-label-mono">
+<th class="py-sm px-md font-medium">Service Name</th>
+<th class="py-sm px-md font-medium">Status</th>
+<th class="py-sm px-md font-medium">Startup Type</th>
+<th class="py-sm px-md font-medium">Log On As</th>
+<th class="py-sm px-md font-medium text-right">Control</th>
+</tr>
+</thead>
+<tbody class="font-label-mono text-label-mono text-on-surface divide-y divide-outline-variant/50">
+<!-- Row 1 (Running) -->
+<tr class="hover:bg-surface-container-highest/50 transition-colors">
+<td class="py-sm px-md">
+<div class="text-on-surface">WinDefend</div>
+<div class="text-on-surface-variant text-[10px] mt-[2px]">Windows Defender Antivirus Service</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-secondary-container/15 text-secondary-container border border-secondary-container/30 text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>
+                                            Running
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Automatic</td>
+<td class="py-sm px-md text-on-surface-variant">LocalSystem</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end relative">
+<input checked="" class="sr-only toggle-checkbox" id="toggle-windefend" type="checkbox"/>
+<label class="toggle-label" for="toggle-windefend"></label>
+</div>
+</td>
+</tr>
+<!-- Row 2 (Stopped) -->
+<tr class="hover:bg-surface-container-highest/50 transition-colors">
+<td class="py-sm px-md">
+<div class="text-on-surface">SysMain</div>
+<div class="text-on-surface-variant text-[10px] mt-[2px]">Superfetch</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant border border-outline-variant text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+                                            Stopped
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Automatic</td>
+<td class="py-sm px-md text-on-surface-variant">LocalSystem</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end relative">
+<input class="sr-only toggle-checkbox" id="toggle-sysmain" type="checkbox"/>
+<label class="toggle-label" for="toggle-sysmain"></label>
+</div>
+</td>
+</tr>
+<!-- Row 3 (Disabled) -->
+<tr class="hover:bg-surface-container-highest/50 transition-colors opacity-60">
+<td class="py-sm px-md">
+<div class="text-on-surface">wuauserv</div>
+<div class="text-on-surface-variant text-[10px] mt-[2px]">Windows Update</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-error/15 text-error border border-error/30 text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                            Disabled
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Disabled</td>
+<td class="py-sm px-md text-on-surface-variant">LocalSystem</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end relative opacity-50 cursor-not-allowed">
+<input class="sr-only toggle-checkbox" disabled="" id="toggle-wuauserv" type="checkbox"/>
+<label class="toggle-label pointer-events-none" for="toggle-wuauserv"></label>
+</div>
+</td>
+</tr>
+<!-- Row 4 (Running, Highlighted active row example) -->
+<tr class="bg-surface-container-highest/30 border-l-2 border-secondary-container hover:bg-surface-container-highest/50 transition-colors">
+<td class="py-sm px-md">
+<div class="text-secondary-container">EventLog</div>
+<div class="text-on-surface-variant text-[10px] mt-[2px]">Windows Event Log</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-secondary-container/15 text-secondary-container border border-secondary-container/30 text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
+                                            Running
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Automatic</td>
+<td class="py-sm px-md text-on-surface-variant">NetworkService</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end relative">
+<input checked="" class="sr-only toggle-checkbox" id="toggle-eventlog" type="checkbox"/>
+<label class="toggle-label" for="toggle-eventlog"></label>
+</div>
+</td>
+</tr>
+<!-- Row 5 (Stopped) -->
+<tr class="hover:bg-surface-container-highest/50 transition-colors">
+<td class="py-sm px-md">
+<div class="text-on-surface">Spooler</div>
+<div class="text-on-surface-variant text-[10px] mt-[2px]">Print Spooler</div>
+</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant border border-outline-variant text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+                                            Stopped
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Automatic</td>
+<td class="py-sm px-md text-on-surface-variant">LocalSystem</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end relative">
+<input class="sr-only toggle-checkbox" id="toggle-spooler" type="checkbox"/>
+<label class="toggle-label" for="toggle-spooler"></label>
+</div>
+</td>
+</tr>
+<!-- Add a few more rows for visual density -->
+<tr class="hover:bg-surface-container-highest/50 transition-colors">
+<td class="py-sm px-md"><div class="text-on-surface">W32Time</div><div class="text-on-surface-variant text-[10px] mt-[2px]">Windows Time</div></td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-secondary-container/15 text-secondary-container border border-secondary-container/30 text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span>Running
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Manual</td>
+<td class="py-sm px-md text-on-surface-variant">LocalService</td>
+<td class="py-sm px-md text-right"><div class="flex items-center justify-end relative"><input checked="" class="sr-only toggle-checkbox" id="toggle-w32" type="checkbox"/><label class="toggle-label" for="toggle-w32"></label></div></td>
+</tr>
+<tr class="hover:bg-surface-container-highest/50 transition-colors">
+<td class="py-sm px-md"><div class="text-on-surface">VSS</div><div class="text-on-surface-variant text-[10px] mt-[2px]">Volume Shadow Copy</div></td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center gap-xs px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant border border-outline-variant text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>Stopped
+                                        </span>
+</td>
+<td class="py-sm px-md text-on-surface-variant">Manual</td>
+<td class="py-sm px-md text-on-surface-variant">LocalSystem</td>
+<td class="py-sm px-md text-right"><div class="flex items-center justify-end relative"><input class="sr-only toggle-checkbox" id="toggle-vss" type="checkbox"/><label class="toggle-label" for="toggle-vss"></label></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Col: Widgets (Takes up 4 cols) -->
+<div class="col-span-12 xl:col-span-4 flex flex-col gap-gutter">
+<!-- Critical Services Watchlist Widget -->
+<div class="bg-surface-container-low border border-error/50 rounded-DEFAULT card-recessed shadow-[0_0_15px_rgba(255,180,171,0.05)] relative overflow-hidden">
+<!-- Subtle Error Glow Background -->
+<div class="absolute inset-0 bg-gradient-to-br from-error/5 to-transparent pointer-events-none"></div>
+<div class="px-md py-sm border-b border-error/30 flex justify-between items-center relative z-10">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-error text-[18px]">warning</span>
+<h3 class="font-label-mono text-label-mono text-error font-bold tracking-widest">CRITICAL WATCHLIST</h3>
+</div>
+<span class="font-stats-lg text-stats-lg text-error">3</span>
+</div>
+<div class="p-sm flex flex-col gap-xs relative z-10">
+<!-- Watchlist Item 1 -->
+<div class="bg-surface-container-highest border border-outline-variant rounded p-sm flex justify-between items-center group hover:border-error/50 transition-colors">
+<div>
+<div class="font-label-mono text-[11px] text-on-surface">LsaIso</div>
+<div class="font-label-mono text-[9px] text-on-surface-variant mt-0.5">Credential Guard</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-[2px] text-secondary-container text-[9px] font-label-mono">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Running
+                                </span>
+</div>
+</div>
+<!-- Watchlist Item 2 (Alert State) -->
+<div class="bg-error/10 border border-error rounded p-sm flex justify-between items-center shadow-[inset_2px_0_0_theme('colors.error')]">
+<div>
+<div class="font-label-mono text-[11px] text-error font-bold">WdNisSvc</div>
+<div class="font-label-mono text-[9px] text-error/80 mt-0.5">Defender Network Inspection</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-[2px] text-error text-[9px] font-label-mono animate-pulse">
+<span class="material-symbols-outlined text-[12px]">cancel</span> Stopped
+                                </span>
+<button class="text-[9px] font-label-mono text-on-surface bg-error/20 hover:bg-error/30 border border-error/50 rounded px-1.5 py-0.5 transition-colors">RESTART</button>
+</div>
+</div>
+<!-- Watchlist Item 3 -->
+<div class="bg-surface-container-highest border border-outline-variant rounded p-sm flex justify-between items-center group hover:border-error/50 transition-colors">
+<div>
+<div class="font-label-mono text-[11px] text-on-surface">WinRM</div>
+<div class="font-label-mono text-[9px] text-on-surface-variant mt-0.5">Windows Remote Management</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-[2px] text-secondary-container text-[9px] font-label-mono">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Running
+                                </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Stats Widget -->
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT card-recessed">
+<div class="px-md py-sm border-b border-outline-variant bg-[#070B14]">
+<h3 class="font-label-mono text-label-mono text-on-surface">SERVICE METRICS</h3>
+</div>
+<div class="p-md grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-highest rounded border border-outline-variant p-sm">
+<div class="font-label-mono text-[10px] text-on-surface-variant mb-1">TOTAL RUNNING</div>
+<div class="font-stats-lg text-stats-lg text-secondary-container">84</div>
+</div>
+<div class="bg-surface-container-highest rounded border border-outline-variant p-sm">
+<div class="font-label-mono text-[10px] text-on-surface-variant mb-1">STOPPED</div>
+<div class="font-stats-lg text-stats-lg text-on-surface">46</div>
+</div>
+<div class="bg-surface-container-highest rounded border border-outline-variant p-sm col-span-2 flex items-center justify-between">
+<div>
+<div class="font-label-mono text-[10px] text-on-surface-variant mb-1">UNRECOGNIZED SERVICES</div>
+<div class="font-stats-lg text-stats-lg text-error">2</div>
+</div>
+<span class="material-symbols-outlined text-error opacity-50 text-[32px]">policy</span>
+</div>
+</div>
+</div>
+<!-- Recent Actions Log (Mini) -->
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT card-recessed flex-1 flex flex-col min-h-[150px]">
+<div class="px-md py-sm border-b border-outline-variant bg-[#070B14] flex justify-between items-center">
+<h3 class="font-label-mono text-label-mono text-on-surface">RECENT CHANGES</h3>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">history</span>
+</div>
+<div class="p-sm flex flex-col gap-1 overflow-y-auto font-label-mono text-[10px]">
+<div class="flex gap-2 text-on-surface-variant py-1 border-b border-outline-variant/30">
+<span class="text-error w-12 shrink-0">10:42:01</span>
+<span><span class="text-on-surface">WdNisSvc</span> terminated unexpectedly.</span>
+</div>
+<div class="flex gap-2 text-on-surface-variant py-1 border-b border-outline-variant/30">
+<span class="text-secondary-container w-12 shrink-0">10:35:12</span>
+<span><span class="text-on-surface">SYSTEM</span> started <span class="text-on-surface">WinDefend</span>.</span>
+</div>
+<div class="flex gap-2 text-on-surface-variant py-1">
+<span class="text-on-surface-variant w-12 shrink-0">09:15:00</span>
+<span><span class="text-on-surface">Admin_JD</span> stopped <span class="text-on-surface">Spooler</span>.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

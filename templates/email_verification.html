@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Verify - SENTINEL EDR</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#0a0f1e",
+                        "secondary-container": "#00e3fd",
+                        "surface": "#051424",
+                        "surface-container": "#122131",
+                        "outline-variant": "#46464c",
+                        "on-surface": "#d4e4fa",
+                        "on-surface-variant": "#c7c6cd",
+                        "error": "#ffb4ab"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+            font-family: 'Inter', sans-serif;
+        }
+        .glow-active {
+            box-shadow: 0 0 15px #00e3fd;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex justify-center items-center p-md">
+
+    <!-- Container -->
+    <div class="bg-surface-container border border-outline-variant/60 rounded-xl p-lg w-full max-w-md flex flex-col gap-md glow-active">
+        <div class="text-center">
+            <h1 class="font-display text-2xl font-bold tracking-tight text-secondary-container">VERIFY IDENTITY</h1>
+            <p class="font-label-mono text-[10px] text-on-surface-variant mt-sm uppercase tracking-widest">Operator Account Activation</p>
+        </div>
+
+        <!-- Messages Block -->
+        {% if messages %}
+        <div class="flex flex-col gap-sm">
+            {% for message in messages %}
+            <div class="p-sm text-xs rounded border {% if message.tags == 'success' %}bg-green-950/40 border-green-500/30 text-green-400{% elif message.tags == 'warning' %}bg-yellow-950/40 border-yellow-500/30 text-yellow-400 font-bold{% else %}bg-error-container/20 border-error text-error{% endif %} font-label-mono text-center">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Verify Form -->
+        <form method="POST" action="{% url 'verify' %}" class="flex flex-col gap-md">
+            {% csrf_token %}
+            
+            <!-- Username -->
+            <div class="flex flex-col gap-xs">
+                <label for="username" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Operator Username</label>
+                <input type="text" name="username" id="username" value="{{ username }}" required placeholder="Confirm username..." class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+            </div>
+
+            <!-- OTP Code -->
+            <div class="flex flex-col gap-xs">
+                <label for="otp" class="font-label-mono text-[10px] text-on-surface-variant uppercase">6-Digit Verification Code (OTP)</label>
+                <input type="text" name="otp" id="otp" required maxlength="6" placeholder="Enter 6-digit code..." class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono text-center tracking-widest font-bold"/>
+            </div>
+
+            <button type="submit" class="w-full bg-secondary-container text-primary-container py-2 rounded font-label-mono text-xs font-bold hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                ACTIVATE ACCOUNT
+            </button>
+        </form>
+
+        <div class="text-center text-[10px] font-label-mono text-on-surface-variant">
+            Did not receive a code? <a href="{% url 'register' %}" class="hover:underline hover:text-secondary-container text-on-surface">Re-register here</a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Services - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">Windows Services</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">MONITORING WINDOWS DAEMONS, CONFIGURATIONS, AND CRITICAL SERVICES</p>
+        </div>
+    </div>
+
+    <!-- Filters Panel -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <form method="GET" action="{% url 'services' %}" class="grid grid-cols-1 md:grid-cols-4 gap-md items-end">
+            <!-- Search Text -->
+            <div class="flex flex-col gap-xs">
+                <label for="q" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Global Search (Name, Display Name)</label>
+                <input type="text" name="q" id="q" value="{{ query }}" placeholder="e.g. WinDefend, Sysmon" class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+            </div>
+
+            <!-- Host Search -->
+            <div class="flex flex-col gap-xs">
+                <label for="host" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Host Filter</label>
+                <input type="text" name="host" id="host" value="{{ host_filter }}" placeholder="e.g. SYSTEM-01" class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+            </div>
+
+            <!-- Status Dropdown -->
+            <div class="flex flex-col gap-xs">
+                <label for="status" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Status</label>
+                <select name="status" id="status" class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono">
+                    <option value="">All Statuses</option>
+                    <option value="Running" {% if status_filter == 'Running' %}selected{% endif %}>Running</option>
+                    <option value="Stopped" {% if status_filter == 'Stopped' %}selected{% endif %}>Stopped</option>
+                    <option value="Paused" {% if status_filter == 'Paused' %}selected{% endif %}>Paused</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="w-full bg-secondary-container text-primary-container px-md py-1.5 rounded font-label-mono text-xs font-bold hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                    FILTER SERVICES
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Grid -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left font-label-mono text-xs border-collapse">
+                <thead>
+                    <tr class="text-on-surface-variant border-b border-outline-variant">
+                        <th class="py-sm px-xs">Host</th>
+                        <th class="py-sm">Service Name</th>
+                        <th class="py-sm">Display Name</th>
+                        <th class="py-sm">Status</th>
+                        <th class="py-sm">Startup Type</th>
+                    </tr>
+                </thead>
+                <tbody id="services-table-body" class="divide-y divide-outline-variant/30 text-on-surface">
+                    {% for svc in page_obj %}
+                    <tr class="hover:bg-surface-container-high/40 transition-colors">
+                        <td class="py-md px-xs font-bold">{{ svc.hostname }}</td>
+                        <td class="py-md font-bold text-secondary-container">{{ svc.name }}</td>
+                        <td class="py-md text-on-surface-variant">{{ svc.display_name }}</td>
+                        <td class="py-md">
+                            <span class="px-sm py-0.5 rounded text-[10px] font-bold uppercase 
+                                {% if svc.status == 'Running' %}bg-green-950/40 text-green-400 border border-green-500/30
+                                {% elif svc.status == 'Stopped' %}bg-red-950/40 text-red-400 border border-red-500/30
+                                {% else %}bg-yellow-950/40 text-yellow-400 border border-yellow-500/30{% endif %}">
+                                {{ svc.status }}
+                            </span>
+                        </td>
+                        <td class="py-md text-on-surface-variant">{{ svc.start_type }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="py-md text-center text-on-surface-variant">No services found matching filters.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-between items-center border-t border-outline-variant/30 pt-md mt-md">
+            <span class="text-xs text-on-surface-variant">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="flex gap-sm">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&host={{ host_filter }}&status={{ status_filter }}" class="bg-surface-container-high border border-outline-variant hover:border-secondary-container text-on-surface px-sm py-1 rounded font-label-mono text-xs">PREV</a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&host={{ host_filter }}&status={{ status_filter }}" class="bg-surface-container-high border border-outline-variant hover:border-secondary-container text-on-surface px-sm py-1 rounded font-label-mono text-xs">NEXT</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Processes - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">Process Telemetry</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">LISTING CURRENT AND SUSPICIOUS EXECUTIONS ACROSS SYSTEM NODES</p>
+        </div>
+    </div>
+
+    <!-- Filters Panel -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <form method="GET" action="{% url 'processes' %}" class="grid grid-cols-1 md:grid-cols-4 gap-md items-end">
+            <!-- Search Text -->
+            <div class="flex flex-col gap-xs col-span-1 md:col-span-2">
+                <label for="q" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Global Search (PID, Process, Cmdline, User)</label>
+                <input type="text" name="q" id="q" value="{{ query }}" placeholder="e.g. powershell.exe, 4122, SYSTEM" class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+            </div>
+
+            <!-- Host Search -->
+            <div class="flex flex-col gap-xs">
+                <label for="host" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Host Filter</label>
+                <input type="text" name="host" id="host" value="{{ host_filter }}" placeholder="e.g. LAPTOP-X" class="w-full bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+            </div>
+
+            <!-- Suspicious Switch & Submit -->
+            <div class="flex items-center gap-md">
+                <label class="flex items-center gap-sm cursor-pointer select-none">
+                    <input type="checkbox" name="suspicious" value="true" {% if suspicious_only == 'true' %}checked{% endif %} class="rounded bg-[#070b14] border-outline-variant text-secondary-container focus:ring-0 focus:ring-offset-0"/>
+                    <span class="font-label-mono text-xs text-error font-bold uppercase">Suspicious Only</span>
+                </label>
+                <button type="submit" class="ml-auto bg-secondary-container text-primary-container px-md py-1.5 rounded font-label-mono text-xs font-bold hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                    FILTER
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Grid -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left font-label-mono text-xs border-collapse">
+                <thead>
+                    <tr class="text-on-surface-variant border-b border-outline-variant">
+                        <th class="py-sm px-xs">Host</th>
+                        <th class="py-sm">PID</th>
+                        <th class="py-sm">PPID</th>
+                        <th class="py-sm">Name</th>
+                        <th class="py-sm">User</th>
+                        <th class="py-sm">CPU %</th>
+                        <th class="py-sm">RAM %</th>
+                        <th class="py-sm">SHA256 Hash</th>
+                        <th class="py-sm">Suspicious Path / Action</th>
+                    </tr>
+                </thead>
+                <tbody id="processes-table-body" class="divide-y divide-outline-variant/30 text-on-surface">
+                    {% for proc in page_obj %}
+                    <tr class="hover:bg-surface-container-high/40 transition-colors {% if proc.is_suspicious %}bg-error-container/5 border-l-2 border-l-error{% endif %}">
+                        <td class="py-md px-xs font-bold">{{ proc.hostname }}</td>
+                        <td class="py-md text-secondary-container">{{ proc.pid }}</td>
+                        <td class="py-md text-on-surface-variant">{{ proc.ppid }}</td>
+                        <td class="py-md font-bold text-on-surface max-w-xs truncate" title="{{ proc.name }}">{{ proc.name }}</td>
+                        <td class="py-md">{{ proc.username }}</td>
+                        <td class="py-md">{{ proc.cpu_percent }}%</td>
+                        <td class="py-md">{{ proc.memory_percent|floatformat:2 }}%</td>
+                        <td class="py-md text-[10px] text-on-surface-variant font-mono select-all truncate max-w-[120px]" title="{{ proc.sha256 }}">{{ proc.sha256|default:"N/A" }}</td>
+                        <td class="py-md">
+                            {% if proc.is_suspicious %}
+                            <span class="text-error font-bold" title="{{ proc.suspicious_reason }}">&#9888; SUSPICIOUS</span>
+                            <span class="block text-[10px] text-on-error-container/85 max-w-xs truncate" title="{{ proc.suspicious_reason }}">{{ proc.suspicious_reason }}</span>
+                            {% else %}
+                            <span class="text-green-400 font-bold">CLEAN</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="py-md text-center text-on-surface-variant">No processes registered for this filter configuration.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-between items-center border-t border-outline-variant/30 pt-md mt-md">
+            <span class="text-xs text-on-surface-variant">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="flex gap-sm">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&host={{ host_filter }}&suspicious={{ suspicious_only }}" class="bg-surface-container-high border border-outline-variant hover:border-secondary-container text-on-surface px-sm py-1 rounded font-label-mono text-xs">PREV</a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&host={{ host_filter }}&suspicious={{ suspicious_only }}" class="bg-surface-container-high border border-outline-variant hover:border-secondary-container text-on-surface px-sm py-1 rounded font-label-mono text-xs">NEXT</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Network Connections - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">Network Activity Logs</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">MONITOR LIVE NETWORK CONNECTION STATE SHIPPED BY ENDPOINT AGENTS</p>
+        </div>
+    </div>
+
+    <!-- Filters Row -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-wrap gap-md justify-between items-center">
+        <form method="GET" class="flex flex-wrap gap-sm items-center w-full">
+            <div class="flex flex-col gap-xs flex-1 min-w-[200px]">
+                <label for="q" class="font-label-mono text-[9px] text-on-surface-variant uppercase">Global Search</label>
+                <input type="text" name="q" id="q" value="{{ query }}" placeholder="Search process, remote IP..." class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+            </div>
+            
+            <div class="flex flex-col gap-xs min-w-[150px]">
+                <label for="host" class="font-label-mono text-[9px] text-on-surface-variant uppercase">Host Filter</label>
+                <input type="text" name="host" id="host" value="{{ host_filter }}" placeholder="e.g. WIN-ENDPOINT" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+            </div>
+
+            <div class="flex flex-col gap-xs min-w-[150px]">
+                <label for="status" class="font-label-mono text-[9px] text-on-surface-variant uppercase">State</label>
+                <select name="status" id="status" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono">
+                    <option value="" {% if status_filter == '' %}selected{% endif %}>All States</option>
+                    <option value="ESTABLISHED" {% if status_filter == 'ESTABLISHED' %}selected{% endif %}>Established</option>
+                    <option value="LISTEN" {% if status_filter == 'LISTEN' %}selected{% endif %}>Listen</option>
+                    <option value="CLOSE_WAIT" {% if status_filter == 'CLOSE_WAIT' %}selected{% endif %}>Close Wait</option>
+                </select>
+            </div>
+
+            <div class="flex gap-sm items-end h-full pt-md">
+                <button type="submit" class="bg-secondary-container text-primary-container font-label-mono text-xs font-bold px-md py-1.5 rounded hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                    FILTER
+                </button>
+                <a href="{% url 'network' %}" class="bg-[#070b14] border border-outline-variant font-label-mono text-xs px-md py-1.5 rounded hover:bg-surface-container-high transition-all">
+                    RESET
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Network Connections Table -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left font-label-mono text-xs border-collapse">
+                <thead>
+                    <tr class="text-on-surface-variant border-b border-outline-variant">
+                        <th class="py-sm px-xs">Endpoint</th>
+                        <th class="py-sm">PID</th>
+                        <th class="py-sm">Process</th>
+                        <th class="py-sm">Local Address</th>
+                        <th class="py-sm">Remote Address</th>
+                        <th class="py-sm">State</th>
+                        <th class="py-sm text-right">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="network-table-body" class="divide-y divide-outline-variant/30 text-on-surface">
+                    {% for conn in page_obj %}
+                    <tr class="hover:bg-surface-container-high/40 transition-colors">
+                        <td class="py-md px-xs font-bold">{{ conn.hostname }}</td>
+                        <td class="py-md text-secondary-container">{{ conn.pid|default:"N/A" }}</td>
+                        <td class="py-md font-bold text-on-surface">{{ conn.process_name }}</td>
+                        <td class="py-md text-on-surface-variant">{{ conn.local_ip }}:{{ conn.local_port }}</td>
+                        <td class="py-md text-on-surface-variant">{{ conn.remote_ip }}:{{ conn.remote_port }}</td>
+                        <td class="py-md">
+                            <span class="px-sm py-0.5 rounded text-[10px] font-bold uppercase
+                                {% if conn.status == 'ESTABLISHED' %}bg-green-950/40 text-green-400 border border-green-500/30
+                                {% else %}bg-yellow-950/40 text-yellow-400 border border-yellow-500/30{% endif %}">
+                                {{ conn.status }}
+                            </span>
+                        </td>
+                        <td class="py-md text-right text-on-surface-variant">{{ conn.timestamp|date:"Y-m-d H:i:s" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="py-md text-center text-on-surface-variant">No network connections recorded. Ensure agent is running.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-between items-center border-t border-outline-variant/30 pt-md mt-md font-label-mono text-xs text-on-surface-variant">
+            <span>Showing Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="flex gap-xs">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&host={{ host_filter }}&status={{ status_filter }}" class="px-sm py-1 bg-[#070b14] border border-outline-variant rounded hover:text-secondary-container transition-colors">&larr; Previous</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&host={{ host_filter }}&status={{ status_filter }}" class="px-sm py-1 bg-[#070b14] border border-outline-variant rounded hover:text-secondary-container transition-colors">Next &rarr;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

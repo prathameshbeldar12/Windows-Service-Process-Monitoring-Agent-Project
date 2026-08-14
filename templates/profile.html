@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Operator Profile - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">Operator Security Profile</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">AUDIT YOUR USER METADATA AND ACCESS PERMISSIONS</p>
+        </div>
+    </div>
+
+    <!-- Profile Details Card -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md max-w-2xl flex flex-col gap-md">
+        <div class="flex items-center gap-md border-b border-outline-variant pb-md mb-xs">
+            <span class="material-symbols-outlined text-secondary-container text-5xl">account_circle</span>
+            <div class="flex flex-col">
+                <h3 class="text-lg font-bold text-on-surface">{{ user.username }}</h3>
+                <span class="font-label-mono text-xs text-secondary-container uppercase">{{ role }} LEVEL PRIVILEGES</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-md font-label-mono text-xs">
+            <div class="flex flex-col gap-xs">
+                <span class="text-on-surface-variant uppercase text-[10px]">Email Address</span>
+                <span class="text-on-surface font-bold">{{ user.email|default:"N/A" }}</span>
+            </div>
+            <div class="flex flex-col gap-xs">
+                <span class="text-on-surface-variant uppercase text-[10px]">System Access Role</span>
+                <span class="text-on-surface font-bold uppercase">{{ role }}</span>
+            </div>
+            <div class="flex flex-col gap-xs">
+                <span class="text-on-surface-variant uppercase text-[10px]">Account Verification Status</span>
+                <span class="font-bold {% if email_verified %}text-green-400{% else %}text-yellow-400{% endif %}">
+                    {% if email_verified %}VERIFIED & ACTIVE{% else %}OTP REGISTERED UNVERIFIED{% endif %}
+                </span>
+            </div>
+            <div class="flex flex-col gap-xs">
+                <span class="text-on-surface-variant uppercase text-[10px]">Last Login Timestamp</span>
+                <span class="text-on-surface font-bold">{{ user.last_login|date:"Y-m-d H:i:s"|default:"First Session" }}</span>
+            </div>
+        </div>
+
+        <!-- Account Operations -->
+        <div class="border-t border-outline-variant pt-md mt-md flex flex-wrap gap-md justify-between items-center">
+            <a href="{% url 'change_password' %}" class="bg-[#070b14] hover:bg-surface-container-high border border-outline-variant text-on-surface hover:text-secondary-container font-label-mono text-xs px-md py-2 rounded transition-all">
+                CHANGE SECURITY KEY
+            </a>
+            <a href="{% url 'logout' %}" class="bg-error-container/20 hover:bg-error-container border border-error text-error font-label-mono text-xs px-md py-2 rounded transition-all">
+                TERMINATE COMMAND SESSION
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

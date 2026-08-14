@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}System Health - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">System Health Telemetry</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">HARDWARE RESOURCE UTILIATION AND BANDWIDTH ANALYSIS</p>
+        </div>
+        <div>
+            <form method="GET" action="{% url 'system_health' %}" id="hostSelectorForm">
+                <select name="host" onchange="document.getElementById('hostSelectorForm').submit()" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono">
+                    <option value="">Select Hostname</option>
+                    {% for host in hostnames %}
+                    <option value="{{ host }}" {% if selected_host == host %}selected{% endif %}>{{ host }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    {% if not latest_metrics %}
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md text-center py-xl font-label-mono text-xs text-on-surface-variant">
+        Select a host from the dropdown to display system resource telemetry charts.
+    </div>
+    {% else %}
+    <!-- Active Resource Metrics Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+        <!-- CPU & Memory Chart -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">CPU & RAM Load Timeline</h3>
+            <div class="relative w-full h-64">
+                <canvas id="resourceUsageChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Network Traffic Chart -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Network Traffic Rates</h3>
+            <div class="relative w-full h-64">
+                <canvas id="networkUsageChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Storage and Top Processes -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+        <!-- Partition Status -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Storage Allocation</h3>
+            <div class="flex flex-col gap-md">
+                <div class="flex justify-between font-label-mono text-xs text-on-surface-variant">
+                    <span>Host Disk Space:</span>
+                    <span class="font-bold text-on-surface">Disk: {{ latest_metrics.0.disk_percent }}% Used</span>
+                </div>
+                <div class="w-full bg-[#070b14] h-3 rounded border border-outline-variant overflow-hidden">
+                    <div class="bg-secondary-container h-full" style="width: {{ latest_metrics.0.disk_percent }}%"></div>
+                </div>
+                <div class="font-label-mono text-[10px] text-on-surface-variant">
+                    Free space remaining: {{ latest_metrics.0.disk_free_bytes|filesizeformat }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top CPU Processes -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Top CPU Processes</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left font-label-mono text-xs">
+                    <thead>
+                        <tr class="text-on-surface-variant border-b border-outline-variant">
+                            <th class="py-xs">PID</th>
+                            <th class="py-xs">Name</th>
+                            <th class="py-xs text-right">CPU</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/30 text-on-surface">
+                        {% for proc in latest_metrics.0.top_cpu_processes %}
+                        <tr>
+                            <td class="py-xs text-secondary-container">{{ proc.pid }}</td>
+                            <td class="py-xs font-bold">{{ proc.name }}</td>
+                            <td class="py-xs text-right">{{ proc.cpu_percent }}%</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="py-xs text-center text-on-surface-variant">No processes logged.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top RAM Processes -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Top Memory Processes</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left font-label-mono text-xs">
+                    <thead>
+                        <tr class="text-on-surface-variant border-b border-outline-variant">
+                            <th class="py-xs">PID</th>
+                            <th class="py-xs">Name</th>
+                            <th class="py-xs text-right">RAM</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/30 text-on-surface">
+                        {% for proc in latest_metrics.0.top_memory_processes %}
+                        <tr>
+                            <td class="py-xs text-secondary-container">{{ proc.pid }}</td>
+                            <td class="py-xs font-bold">{{ proc.name }}</td>
+                            <td class="py-xs text-right">{{ proc.memory_percent }}%</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="py-xs text-center text-on-surface-variant">No processes logged.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if latest_metrics %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Chart.defaults.color = '#c7c6cd';
+        Chart.defaults.font.family = 'JetBrains Mono';
+
+        // Extract dates and values
+        // Reverse array to read chronological left-to-right
+        const metrics = [
+            {% for m in latest_metrics %}
+            {
+                time: "{{ m.timestamp|date:'H:i:s' }}",
+                cpu: {{ m.cpu_percent }},
+                ram: {{ m.memory_percent }},
+                upload: {{ m.network_upload_bytes }},
+                download: {{ m.network_download_bytes }}
+            },
+            {% endfor %}
+        ].reverse();
+
+        const labels = metrics.map(m => m.time);
+
+        // Usage Chart config
+        const usageCtx = document.getElementById('resourceUsageChart').getContext('2d');
+        new Chart(usageCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'CPU Load %',
+                        data: metrics.map(m => m.cpu),
+                        borderColor: '#00e3fd',
+                        backgroundColor: 'rgba(0, 227, 253, 0.1)',
+                        borderWidth: 1.5,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'RAM Load %',
+                        data: metrics.map(m => m.ram),
+                        borderColor: '#bfc6de',
+                        backgroundColor: 'rgba(191, 198, 222, 0.1)',
+                        borderWidth: 1.5,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        grid: { color: 'rgba(70, 70, 76, 0.2)' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Network Chart config
+        const netCtx = document.getElementById('networkUsageChart').getContext('2d');
+        new Chart(netCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Upload (KB/s)',
+                        data: metrics.map(m => (m.upload / 1024).toFixed(2)),
+                        borderColor: '#ff9f43',
+                        backgroundColor: 'rgba(255, 159, 67, 0.1)',
+                        borderWidth: 1.5,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Download (KB/s)',
+                        data: metrics.map(m => (m.download / 1024).toFixed(2)),
+                        borderColor: '#10ac84',
+                        backgroundColor: 'rgba(16, 172, 132, 0.1)',
+                        borderWidth: 1.5,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(70, 70, 76, 0.2)' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header Page Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">EDR Command Center</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">REAL-TIME ENDPOINT THREAT TELEMETRY MONITORING</p>
+        </div>
+        <div class="flex items-center gap-sm">
+            <span class="inline-block w-2.5 h-2.5 bg-secondary-container rounded-full animate-ping"></span>
+            <span class="font-label-mono text-xs text-secondary-container">LIVE STATUS FEED ACTIVE</span>
+        </div>
+    </div>
+    
+    <!-- Active Endpoint Warning Banner -->
+    {% if endpoints_count == 0 %}
+    <div class="bg-error-container/20 border border-error text-error p-md rounded-xl text-center font-label-mono text-xs glow-critical">
+        ⚠️ NO LIVE ENDPOINT CONNECTED. Start the Sentinel EDR agent on a Windows endpoint to ingest live process, network, and systems health telemetry.
+    </div>
+    {% endif %}
+
+    <!-- Threat Severity Breakdown Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-md">
+        <!-- Critical -->
+        <div class="bg-surface-container-low border border-error/30 rounded-xl p-md flex flex-col justify-between glow-critical">
+            <div class="flex justify-between items-start">
+                <span class="font-label-mono text-xs text-error font-bold uppercase">Critical Threats</span>
+                <span class="material-symbols-outlined text-error text-xl">gpp_maybe</span>
+            </div>
+            <div class="mt-md">
+                <span id="critical-alerts-val" class="font-label-mono text-4xl font-bold text-error">{{ critical_alerts }}</span>
+                <p class="text-[10px] text-on-surface-variant mt-sm">ACTIVE SHELLS & INFECTED HOSTS</p>
+            </div>
+        </div>
+
+        <!-- High -->
+        <div class="bg-surface-container-low border border-orange-500/30 rounded-xl p-md flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+                <span class="font-label-mono text-xs text-orange-400 font-bold uppercase">High Threats</span>
+                <span class="material-symbols-outlined text-orange-400 text-xl">error</span>
+            </div>
+            <div class="mt-md">
+                <span id="high-alerts-val" class="font-label-mono text-4xl font-bold text-orange-400">{{ high_alerts }}</span>
+                <p class="text-[10px] text-on-surface-variant mt-sm">SUSPICIOUS LATERAL MOVEMENT</p>
+            </div>
+        </div>
+
+        <!-- Medium -->
+        <div class="bg-surface-container-low border border-yellow-500/30 rounded-xl p-md flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+                <span class="font-label-mono text-xs text-yellow-400 font-bold uppercase">Medium Severity</span>
+                <span class="material-symbols-outlined text-yellow-400 text-xl">warning</span>
+            </div>
+            <div class="mt-md">
+                <span id="medium-alerts-val" class="font-label-mono text-4xl font-bold text-yellow-400">{{ medium_alerts }}</span>
+                <p class="text-[10px] text-on-surface-variant mt-sm">POLICY & OUTBOUND VIOLATIONS</p>
+            </div>
+        </div>
+
+        <!-- Low -->
+        <div class="bg-surface-container-low border border-green-500/30 rounded-xl p-md flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+                <span class="font-label-mono text-xs text-green-400 font-bold uppercase">Low Alerts</span>
+                <span class="material-symbols-outlined text-green-400 text-xl">verified_user</span>
+            </div>
+            <div class="mt-md">
+                <span id="low-alerts-val" class="font-label-mono text-4xl font-bold text-green-400">{{ low_alerts }}</span>
+                <p class="text-[10px] text-on-surface-variant mt-sm">SYSTEM RECONFIGURATIONS</p>
+            </div>
+        </div>
+
+        <!-- Endpoints Count -->
+        <div class="bg-surface-container-low border border-secondary-container/30 rounded-xl p-md flex flex-col justify-between glow-active">
+            <div class="flex justify-between items-start">
+                <span class="font-label-mono text-xs text-secondary-container font-bold uppercase">Endpoints Inventory</span>
+                <span class="material-symbols-outlined text-secondary-container text-xl">computer</span>
+            </div>
+            <div class="mt-md flex justify-between items-baseline">
+                <div>
+                    <span id="endpoints-online-val" class="font-label-mono text-4xl font-bold text-green-400" title="Online">{{ online_count }}</span>
+                    <span class="font-label-mono text-xs text-on-surface-variant font-bold">/</span>
+                    <span id="endpoints-total-val" class="font-label-mono text-2xl text-on-surface-variant" title="Total registered">{{ endpoints_count }}</span>
+                </div>
+                <p class="text-[10px] text-on-surface-variant mt-sm uppercase font-bold text-right">ONLINE / TOTAL</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Threat Visualizations -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+        <!-- Chart Block (Left 2 Columns) -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md lg:col-span-2 flex flex-col">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Alert Distribution Profile</h3>
+            <div class="relative w-full h-64 flex justify-center items-center">
+                <canvas id="alertSeverityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- SOC Quick Actions / Status Summary (Right 1 Column) -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface uppercase border-b border-outline-variant pb-xs">System Quick actions</h3>
+            <div class="flex flex-col gap-sm mt-sm">
+                <a href="{% url 'ioc_management' %}" class="flex items-center gap-md p-sm bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant rounded text-on-surface transition-all">
+                    <span class="material-symbols-outlined text-secondary-container">upload_file</span>
+                    <div class="flex flex-col">
+                        <span class="font-label-mono text-xs font-bold">Upload IOC Signatures</span>
+                        <span class="text-[10px] text-on-surface-variant">Update agent blacklists</span>
+                    </div>
+                </a>
+                <a href="{% url 'reports' %}" class="flex items-center gap-md p-sm bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant rounded text-on-surface transition-all">
+                    <span class="material-symbols-outlined text-secondary-container">picture_as_pdf</span>
+                    <div class="flex flex-col">
+                        <span class="font-label-mono text-xs font-bold">Generate Threat Report</span>
+                        <span class="text-[10px] text-on-surface-variant">Compile PDF/CSV documentation</span>
+                    </div>
+                </a>
+                <a href="{% url 'investigation' %}" class="flex items-center gap-md p-sm bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant rounded text-on-surface transition-all">
+                    <span class="material-symbols-outlined text-secondary-container">travel_explore</span>
+                    <div class="flex flex-col">
+                        <span class="font-label-mono text-xs font-bold">Open SOC Case File</span>
+                        <span class="text-[10px] text-on-surface-variant">Run host forensics timelines</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Security Alerts Feed -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <div class="flex justify-between items-center border-b border-outline-variant pb-sm mb-md">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface uppercase">Active Incident Feed</h3>
+            <a href="{% url 'alerts' %}" class="font-label-mono text-xs text-secondary-container hover:underline">View All Alerts &rarr;</a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left font-label-mono text-xs border-collapse">
+                <thead>
+                    <tr class="text-on-surface-variant border-b border-outline-variant">
+                        <th class="py-sm px-xs">Severity</th>
+                        <th class="py-sm">Alert Type</th>
+                        <th class="py-sm">Endpoint</th>
+                        <th class="py-sm">Username</th>
+                        <th class="py-sm">Description</th>
+                        <th class="py-sm text-right">Time Ingested</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-alerts-table-body" class="divide-y divide-outline-variant/30 text-on-surface">
+                    {% for alert in recent_alerts %}
+                    <tr class="hover:bg-surface-container-high/40 transition-colors">
+                        <td class="py-md px-xs">
+                            <span class="px-sm py-0.5 rounded text-[10px] font-bold uppercase 
+                                {% if alert.severity == 'critical' %}bg-red-950/40 text-red-400 border border-red-500/30
+                                {% elif alert.severity == 'high' %}bg-orange-950/40 text-orange-400 border border-orange-500/30
+                                {% elif alert.severity == 'medium' %}bg-yellow-950/40 text-yellow-400 border border-yellow-500/30
+                                {% else %}bg-blue-950/40 text-blue-400 border border-blue-500/30{% endif %}">
+                                {{ alert.severity }}
+                            </span>
+                        </td>
+                        <td class="py-md font-bold text-secondary-container">{{ alert.type }}</td>
+                        <td class="py-md">{{ alert.hostname }}</td>
+                        <td class="py-md">{{ alert.username }}</td>
+                        <td class="py-md text-on-surface-variant max-w-xs truncate" title="{{ alert.description }}">{{ alert.description }}</td>
+                        <td class="py-md text-right text-on-surface-variant">{{ alert.timestamp|date:"Y-m-d H:i:s" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-md text-center text-on-surface-variant">No alerts triggered. Endpoints are reporting normal activity profiles.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch chart data dynamically
+        fetch('{% url "dashboard_chart_api" %}')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('alertSeverityChart').getContext('2d');
+                
+                // Set default chart.js text configurations
+                Chart.defaults.color = '#c7c6cd';
+                Chart.defaults.font.family = 'JetBrains Mono';
+
+                const config = {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Threat Count',
+                            data: data.values,
+                            backgroundColor: data.labels.map(label => {
+                                if (label === 'CRITICAL') return 'rgba(255, 180, 171, 0.6)';
+                                if (label === 'HIGH') return 'rgba(243, 156, 18, 0.6)';
+                                if (label === 'MEDIUM') return 'rgba(241, 196, 15, 0.6)';
+                                return 'rgba(0, 227, 253, 0.6)';
+                            }),
+                            borderColor: data.labels.map(label => {
+                                if (label === 'CRITICAL') return '#ffb4ab';
+                                if (label === 'HIGH') return '#f39c12';
+                                if (label === 'MEDIUM') return '#f1c40f';
+                                return '#00e3fd';
+                            }),
+                            borderWidth: 1.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                grid: {
+                                    color: 'rgba(70, 70, 76, 0.2)'
+                                },
+                                ticks: {
+                                    precision: 0
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                };
+
+                new Chart(ctx, config);
+            });
+    });
+</script>
+{% endblock %}

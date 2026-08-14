@@ -1,0 +1,42 @@
+{
+    "api_url": "http://127.0.0.1:5000",
+    "agent_id": "windows-endpoint-01",
+    "auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2NDI4NTk0LCJpYXQiOjE3ODY0MjY3OTQsImp0aSI6ImU1ZmE2ODMwZGI4ZjQ5NzU4NTI5ZGM0ZmFlM2EzMzc2IiwidXNlcl9pZCI6IjQifQ.4J7RW8ARKeKFy3Yl_oexlJfsNgBiRmG2q6ldaDm_ezg",
+    "auth_refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc4Njc5MjA5OSwiaWF0IjoxNzg2MTg3Mjk5LCJqdGkiOiI1YzAyZTE5OTYxMjc0ZmQyYjc4ZGIwYzczNjI5OTVkZCIsInVzZXJfaWQiOiI0In0.swVmP9iU2xVuc1V-mb9G8-F7ZT2KA7V7nRCK8vJ1LNE",
+    "username": "agent_user",
+    "password": "agent_password_123",
+    "intervals": {
+        "process_monitor": 5,
+        "service_monitor": 10,
+        "eventlog_monitor": 15,
+        "system_health": 30,
+        "ioc_engine": 60
+    },
+    "modules": {
+        "process_monitor": true,
+        "service_monitor": true,
+        "eventlog_monitor": true,
+        "system_health": true,
+        "ioc_engine": true
+    },
+    "suspicious_process_names": [
+        "cmd.exe",
+        "powershell.exe",
+        "wmic.exe",
+        "rundll32.exe",
+        "regsvr32.exe",
+        "mshta.exe",
+        "psexec.exe",
+        "mimikatz.exe",
+        "procdump.exe",
+        "nc.exe",
+        "ncat.exe"
+    ],
+    "critical_services": [
+        "WinDefend",
+        "MpsSvc",
+        "Sysmon64",
+        "Sysmon",
+        "EventLog"
+    ]
+}

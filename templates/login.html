@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Login - SENTINEL EDR{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
+
+    <div
+        class="
+        auth-card
+        page-enter
+        glass
+        w-full
+        max-w-md
+        border
+        border-cyan-400/20
+        rounded-2xl
+        shadow-2xl
+        overflow-hidden
+        "
+    >
+
+        <!-- Header -->
+        <div class="px-6 sm:px-8 pt-8 text-center">
+
+            <div
+                class="
+                w-16
+                h-16
+                mx-auto
+                rounded-2xl
+                border
+                border-cyan-400/30
+                bg-cyan-400/5
+                flex
+                items-center
+                justify-center
+                animate-pulse-glow
+                "
+            >
+                <span class="material-symbols-outlined text-3xl text-cyan-400">
+                    shield
+                </span>
+            </div>
+
+            <h1
+                class="
+                mt-5
+                text-2xl
+                sm:text-3xl
+                font-extrabold
+                tracking-tight
+                text-cyan-400
+                "
+            >
+                SENTINEL EDR
+            </h1>
+
+            <p
+                class="
+                mt-2
+                text-[10px]
+                sm:text-xs
+                font-mono
+                tracking-[.22em]
+                text-slate-400
+                "
+            >
+                COMMAND SESSION PORTAL
+            </p>
+
+            <div class="mt-4 flex items-center justify-center gap-2">
+
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+
+                <span class="text-[10px] font-mono text-emerald-400">
+                    SECURE AUTHENTICATION ONLINE
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- Form -->
+        <form
+            method="POST"
+            action="{% url 'login' %}"
+            class="px-6 sm:px-8 py-8 space-y-5"
+        >
+
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div>
+
+                <label
+                    for="id_username"
+                    class="block mb-2 text-[10px] font-mono uppercase tracking-wider text-slate-400"
+                >
+                    Operator Username
+                </label>
+
+                <div class="relative">
+
+                    <span
+                        class="
+                        material-symbols-outlined
+                        absolute
+                        left-3
+                        top-1/2
+                        -translate-y-1/2
+                        text-slate-500
+                        "
+                    >
+                        person
+                    </span>
+
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        required
+                        autocomplete="username"
+                        placeholder="Enter username..."
+                        class="
+                        input-field
+                        w-full
+                        bg-[#070b14]
+                        border
+                        border-slate-700
+                        rounded-xl
+                        pl-11
+                        pr-4
+                        py-3
+                        text-sm
+                        font-mono
+                        text-slate-200
+                        placeholder:text-slate-600
+                        "
+                    >
+
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div>
+
+                <div class="flex justify-between mb-2">
+
+                    <label
+                        for="id_password"
+                        class="text-[10px] font-mono uppercase tracking-wider text-slate-400"
+                    >
+                        Security Key / Password
+                    </label>
+
+                </div>
+
+                <div class="relative">
+
+                    <span
+                        class="
+                        material-symbols-outlined
+                        absolute
+                        left-3
+                        top-1/2
+                        -translate-y-1/2
+                        text-slate-500
+                        "
+                    >
+                        lock
+                    </span>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="id_password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="Enter security password..."
+                        class="
+                        input-field
+                        w-full
+                        bg-[#070b14]
+                        border
+                        border-slate-700
+                        rounded-xl
+                        pl-11
+                        pr-12
+                        py-3
+                        text-sm
+                        font-mono
+                        text-slate-200
+                        placeholder:text-slate-600
+                        "
+                    >
+
+                    <button
+                        type="button"
+                        onclick="togglePassword('id_password', this)"
+                        class="
+                        absolute
+                        right-3
+                        top-1/2
+                        -translate-y-1/2
+                        text-slate-500
+                        hover:text-cyan-400
+                        "
+                    >
+                        <span class="material-symbols-outlined text-base">
+                            visibility
+                        </span>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Forgot -->
+            <div class="flex justify-end">
+
+                <a
+                    href="{% url 'forgot_password' %}"
+                    class="
+                    text-[10px]
+                    font-mono
+                    text-slate-400
+                    hover:text-cyan-400
+                    transition
+                    "
+                >
+                    Forgot password?
+                </a>
+
+            </div>
+
+            <!-- Button -->
+            <button
+                type="submit"
+                class="
+                cyber-button
+                w-full
+                bg-cyan-400
+                hover:bg-cyan-300
+                text-[#051424]
+                py-3
+                rounded-xl
+                font-mono
+                text-xs
+                font-bold
+                tracking-wider
+                "
+            >
+                <span class="inline-flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-base">
+                        login
+                    </span>
+
+                    AUTHENTICATE
+                </span>
+            </button>
+
+            <!-- Register -->
+            <div class="text-center pt-2">
+
+                <span class="text-[10px] font-mono text-slate-500">
+                    NEW OPERATOR?
+                </span>
+
+                <a
+                    href="{% url 'register' %}"
+                    class="
+                    ml-1
+                    text-[10px]
+                    font-mono
+                    text-cyan-400
+                    hover:underline
+                    "
+                >
+                    CREATE ACCOUNT
+                </a>
+
+            </div>
+
+        </form>
+
+        <!-- Footer -->
+        <div
+            class="
+            px-6
+            py-4
+            border-t
+            border-slate-700/50
+            bg-black/10
+            text-center
+            "
+        >
+            <p class="text-[9px] font-mono text-slate-600">
+                SENTINEL EDR // AUTHORIZATION SYSTEM
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

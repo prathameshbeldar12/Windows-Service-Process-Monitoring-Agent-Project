@@ -1,0 +1,10 @@
+/* Custom EDR styles matching Midnight Protocol */
+.glow-active {
+    box-shadow: 0 0 10px #00e3fd;
+}
+.glow-critical {
+    box-shadow: 0 0 12px #ffb4ab;
+}
+.beveled-edge {
+    border-top: 1px solid #2c3a4c;
+}

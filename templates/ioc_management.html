@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}IOC Management - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">IOC Management</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">REGISTER AND DISTRIBUTE INDICATORS OF COMPROMISE THREAT SIGNATURES TO AGENTS</p>
+        </div>
+    </div>
+
+    <!-- Actions Row: Add IOC & Upload File -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+        <!-- Register Single IOC (Left 2 Columns) -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md lg:col-span-2">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Add Single Indicator</h3>
+            <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                {% csrf_token %}
+                <input type="hidden" name="add_ioc" value="true"/>
+                
+                <!-- Name -->
+                <div class="flex flex-col gap-xs">
+                    <label for="name" class="font-label-mono text-[10px] text-on-surface-variant uppercase">IOC Rule Name</label>
+                    <input type="text" name="name" id="name" required placeholder="e.g. Cobalt Strike IP, Mimikatz SHA256" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+                </div>
+
+                <!-- Type -->
+                <div class="flex flex-col gap-xs">
+                    <label for="type" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Indicator Type</label>
+                    <select name="type" id="type" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono">
+                        <option value="hash">Hash (SHA256)</option>
+                        <option value="file_name">File Name</option>
+                        <option value="path">File Path</option>
+                        <option value="command_line">Command Line</option>
+                        <option value="parent_process">Parent Process</option>
+                        <option value="registry_key">Registry Key</option>
+                        <option value="ip_address">IP Address</option>
+                        <option value="domain">Domain</option>
+                        <option value="url">URL</option>
+                    </select>
+                </div>
+
+                <!-- Value -->
+                <div class="flex flex-col gap-xs md:col-span-2">
+                    <label for="value" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Target Value / Signature</label>
+                    <textarea name="value" id="value" required placeholder="Paste signature hash value, IP, registry path..." rows="2" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"></textarea>
+                </div>
+
+                <!-- MITRE ATT&CK -->
+                <div class="flex flex-col gap-xs">
+                    <label for="mitre_technique" class="font-label-mono text-[10px] text-on-surface-variant uppercase">MITRE ATT&CK Technique</label>
+                    <input type="text" name="mitre_technique" id="mitre_technique" value="T1059" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+                </div>
+
+                <!-- Description -->
+                <div class="flex flex-col gap-xs">
+                    <label for="description" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Remediation / Description</label>
+                    <input type="text" name="description" id="description" placeholder="e.g. Isolate machine, terminate process" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+                </div>
+
+                <div class="md:col-span-2 flex justify-end">
+                    <button type="submit" class="bg-secondary-container text-primary-container px-md py-1.5 rounded font-label-mono text-xs font-bold hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                        REGISTER IOC
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bulk Upload IOCs (Right 1 Column) -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col justify-between">
+            <div>
+                <h3 class="font-label-mono text-sm font-bold text-on-surface mb-sm uppercase">Bulk Upload (JSON / CSV)</h3>
+                <p class="text-[10px] text-on-surface-variant mb-md leading-relaxed">
+                    Import files structured with headers: <code>name</code>, <code>type</code>, <code>value</code>, <code>mitre_technique</code>, <code>description</code>.
+                </p>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-md">
+                {% csrf_token %}
+                <div class="flex flex-col gap-xs">
+                    <input type="file" name="upload_file" required class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+                </div>
+                <button type="submit" class="w-full bg-surface-container-highest border border-outline-variant hover:border-secondary-container text-secondary-container px-md py-1.5 rounded font-label-mono text-xs font-bold transition-all">
+                    UPLOAD FILE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Signatures List -->
+    <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md">
+        <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Registered IOC Signatures</h3>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left font-label-mono text-xs border-collapse">
+                <thead>
+                    <tr class="text-on-surface-variant border-b border-outline-variant">
+                        <th class="py-sm px-xs">Name</th>
+                        <th class="py-sm">Type</th>
+                        <th class="py-sm">Value</th>
+                        <th class="py-sm">MITRE</th>
+                        <th class="py-sm">Status</th>
+                        <th class="py-sm text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/30 text-on-surface">
+                    {% for ioc in page_obj %}
+                    <tr class="hover:bg-surface-container-high/40 transition-colors">
+                        <td class="py-md px-xs font-bold text-secondary-container">{{ ioc.name }}</td>
+                        <td class="py-md uppercase text-on-surface-variant">{{ ioc.type }}</td>
+                        <td class="py-md truncate max-w-xs select-all font-mono" title="{{ ioc.value }}">{{ ioc.value }}</td>
+                        <td class="py-md text-on-surface-variant">{{ ioc.mitre_technique }}</td>
+                        <td class="py-md">
+                            {% if ioc.is_active %}
+                            <span class="text-green-400 font-bold">ACTIVE</span>
+                            {% else %}
+                            <span class="text-on-surface-variant font-bold">DISABLED</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-md text-right flex justify-end gap-sm">
+                            <a href="{% url 'toggle_ioc' ioc.id %}" class="bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant px-sm py-0.5 rounded text-[10px] text-on-surface transition-all">
+                                TOGGLE
+                            </a>
+                            <a href="{% url 'delete_ioc' ioc.id %}" onclick="return confirm('Confirm deletion of this threat signature?')" class="bg-red-950/40 hover:bg-red-900 border border-red-500/30 px-sm py-0.5 rounded text-[10px] text-red-400 transition-all">
+                                DELETE
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-md text-center text-on-surface-variant">No indicators of compromise registered.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-between items-center border-t border-outline-variant/30 pt-md mt-md">
+            <span class="text-xs text-on-surface-variant">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="flex gap-sm">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="bg-surface-container-high border border-outline-variant hover:border-secondary-container text-on-surface px-sm py-1 rounded font-label-mono text-xs">PREV</a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="bg-surface-container-high border border-outline-variant hover:border-secondary-container text-on-surface px-sm py-1 rounded font-label-mono text-xs">NEXT</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+databases:
+  - name: sentinel-db
+    plan: free
+
+services:
+  - type: keyvalue
+    name: sentinel-redis
+    plan: free
+
+  - type: web
+    name: sentinel-edr-soc
+    env: docker
+    dockerFilePath: Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sentinel-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: sentinel-redis
+          property: connectionString
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "*"
+    startCommand: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && daphne -b 0.0.0.0 -p 5000 core.asgi:application"

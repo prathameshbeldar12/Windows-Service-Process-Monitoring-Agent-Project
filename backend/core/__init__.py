@@ -1,0 +1,1 @@
+# Core EDR Settings Package

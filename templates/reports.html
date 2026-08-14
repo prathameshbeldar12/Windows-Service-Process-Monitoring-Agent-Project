@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">SOC Reports Center</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">COMPILE INCIDENT SUMMARIES AND AUDIT HISTORY</p>
+        </div>
+    </div>
+
+    <!-- Actions Row: Generate Report -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+        <!-- Generate Panel -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md md:col-span-1 flex flex-col justify-between">
+            <div>
+                <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Export Threat Summary</h3>
+                <form method="POST" action="{% url 'generate_report' %}" class="flex flex-col gap-md">
+                    {% csrf_token %}
+                    
+                    <!-- Report Name -->
+                    <div class="flex flex-col gap-xs">
+                        <label for="name" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Document Name</label>
+                        <input type="text" name="name" id="name" required placeholder="e.g. Weekly Security Report" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono"/>
+                    </div>
+
+                    <!-- Format -->
+                    <div class="flex flex-col gap-xs">
+                        <label for="type" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Format Profile</label>
+                        <select name="type" id="type" class="bg-[#070b14] text-on-surface border border-outline-variant rounded px-sm py-1.5 focus:border-secondary-container focus:ring-1 focus:ring-secondary-container text-xs font-label-mono">
+                            <option value="pdf">Security PDF Summary Document</option>
+                            <option value="csv">Raw Alerts List (CSV)</option>
+                            <option value="json">Raw Telemetry & Stats (JSON)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-secondary-container text-primary-container px-md py-1.5 rounded font-label-mono text-xs font-bold hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                        COMPILE & DOWNLOAD
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Generated Documents History (Right 2 Columns) -->
+        <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md md:col-span-2">
+            <h3 class="font-label-mono text-sm font-bold text-on-surface mb-md uppercase">Generated Report Archives</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left font-label-mono text-xs border-collapse">
+                    <thead>
+                        <tr class="text-on-surface-variant border-b border-outline-variant">
+                            <th class="py-sm px-xs">Report Name</th>
+                            <th class="py-sm">Format</th>
+                            <th class="py-sm">Compiled By</th>
+                            <th class="py-sm">Total Alerts</th>
+                            <th class="py-sm text-right">Download Link</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/30 text-on-surface">
+                        {% for report in reports %}
+                        <tr class="hover:bg-surface-container-high/40 transition-colors">
+                            <td class="py-md px-xs font-bold text-secondary-container">{{ report.name }}</td>
+                            <td class="py-md uppercase text-on-surface-variant">{{ report.type }}</td>
+                            <td class="py-md">{{ report.created_by.username }}</td>
+                            <td class="py-md font-bold text-error">{{ report.summary_data.total_count }}</td>
+                            <td class="py-md text-right">
+                                <!-- Download matching media file path -->
+                                <a href="/{{ report.file_path }}" download class="bg-surface-container-high hover:bg-secondary-container hover:text-primary-container border border-outline-variant px-sm py-1 rounded transition-all">
+                                    DOWNLOAD
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-md text-center text-on-surface-variant">No report history compiled.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

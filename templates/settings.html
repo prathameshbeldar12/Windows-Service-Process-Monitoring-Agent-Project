@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - SENTINEL EDR{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-lg">
+    <!-- Header -->
+    <div class="flex justify-between items-center pb-md border-b border-outline-variant">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight text-on-surface">EDR Settings Profile</h2>
+            <p class="text-xs font-label-mono text-on-surface-variant mt-xs">CONFIGURE TELEMETRY POLL CYCLES AND INTEGRATION WARNING NODES</p>
+        </div>
+    </div>
+
+    <!-- settings Editor Form -->
+    <form method="POST" action="{% url 'settings' %}" class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+        {% csrf_token %}
+        
+        <!-- left side settings: poll intervals -->
+        <div class="flex flex-col gap-lg">
+            <!-- Polling Intervals Card -->
+            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+                <h3 class="font-label-mono text-xs font-bold text-on-surface uppercase border-b border-outline-variant pb-xs">Agent Telemetry Check-in Intervals</h3>
+                
+                <!-- Process Poll -->
+                <div class="grid grid-cols-2 gap-md items-center">
+                    <label for="process_interval" class="font-label-mono text-[11px] text-on-surface-variant uppercase">Process Telemetry (Seconds)</label>
+                    <input type="number" name="process_interval" id="process_interval" value="{{ settings.process_interval }}" min="1" max="3600" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono text-right"/>
+                </div>
+
+                <!-- Service Poll -->
+                <div class="grid grid-cols-2 gap-md items-center">
+                    <label for="service_interval" class="font-label-mono text-[11px] text-on-surface-variant uppercase">Service Status Poll (Seconds)</label>
+                    <input type="number" name="service_interval" id="service_interval" value="{{ settings.service_interval }}" min="1" max="3600" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono text-right"/>
+                </div>
+
+                <!-- Event Log Poll -->
+                <div class="grid grid-cols-2 gap-md items-center">
+                    <label for="log_interval" class="font-label-mono text-[11px] text-on-surface-variant uppercase">Event Log Poll (Seconds)</label>
+                    <input type="number" name="log_interval" id="log_interval" value="{{ settings.log_interval }}" min="1" max="3600" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono text-right"/>
+                </div>
+
+                <!-- Health Poll -->
+                <div class="grid grid-cols-2 gap-md items-center">
+                    <label for="health_interval" class="font-label-mono text-[11px] text-on-surface-variant uppercase">System Health Poll (Seconds)</label>
+                    <input type="number" name="health_interval" id="health_interval" value="{{ settings.health_interval }}" min="1" max="3600" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono text-right"/>
+                </div>
+            </div>
+
+            <!-- Database Retention Card -->
+            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+                <h3 class="font-label-mono text-xs font-bold text-on-surface uppercase border-b border-outline-variant pb-xs">Database Log retention Policies</h3>
+                
+                <div class="grid grid-cols-2 gap-md items-center">
+                    <label for="retention_days" class="font-label-mono text-[11px] text-on-surface-variant uppercase">Data Retention Period (Days)</label>
+                    <input type="number" name="retention_days" id="retention_days" value="{{ settings.retention_days }}" min="1" max="365" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono text-right"/>
+                </div>
+                <p class="text-[10px] text-on-surface-variant leading-relaxed">
+                    Logs, process records, and health metrics older than this period will be pruned automatically from the database on daily schedules.
+                </p>
+            </div>
+        </div>
+
+        <!-- right side settings: Integration modules -->
+        <div class="flex flex-col gap-lg">
+            <!-- Slack Webhook Card -->
+            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+                <h3 class="font-label-mono text-xs font-bold text-on-surface uppercase border-b border-outline-variant pb-xs">Slack Warning Integration</h3>
+                
+                <div class="flex justify-between items-center">
+                    <label class="font-label-mono text-[11px] text-on-surface-variant uppercase">Enable Slack Notifications</label>
+                    <select name="slack_enable" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono">
+                        <option value="false" {% if settings.slack_enable == 'false' %}selected{% endif %}>Disabled</option>
+                        <option value="true" {% if settings.slack_enable == 'true' %}selected{% endif %}>Enabled</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-xs">
+                    <label for="slack_webhook" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Slack Webhook URL</label>
+                    <input type="text" name="slack_webhook" id="slack_webhook" value="{{ settings.slack_webhook }}" placeholder="https://hooks.slack.com/services/..." class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+                </div>
+            </div>
+
+            <!-- Telegram Bot Card -->
+            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+                <h3 class="font-label-mono text-xs font-bold text-on-surface uppercase border-b border-outline-variant pb-xs">Telegram Warning Integration</h3>
+                
+                <div class="flex justify-between items-center">
+                    <label class="font-label-mono text-[11px] text-on-surface-variant uppercase">Enable Telegram Alerts</label>
+                    <select name="telegram_enable" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono">
+                        <option value="false" {% if settings.telegram_enable == 'false' %}selected{% endif %}>Disabled</option>
+                        <option value="true" {% if settings.telegram_enable == 'true' %}selected{% endif %}>Enabled</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="flex flex-col gap-xs">
+                        <label for="telegram_bot_token" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Telegram Bot Token</label>
+                        <input type="text" name="telegram_bot_token" id="telegram_bot_token" value="{{ settings.telegram_bot_token }}" placeholder="e.g. 123456:ABC-DEF..." class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+                    </div>
+                    <div class="flex flex-col gap-xs">
+                        <label for="telegram_chat_id" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Chat ID</label>
+                        <input type="text" name="telegram_chat_id" id="telegram_chat_id" value="{{ settings.telegram_chat_id }}" placeholder="e.g. -100123456" class="bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SMTP Email Verification Test Card -->
+            {% if request.user.profile.role == 'admin' %}
+            <div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+                <h3 class="font-label-mono text-xs font-bold text-on-surface uppercase border-b border-outline-variant pb-xs">SMTP Dispatch Verification</h3>
+                <div class="flex flex-col gap-xs">
+                    <label for="test_email_addr" class="font-label-mono text-[10px] text-on-surface-variant uppercase">Test Recipient Email</label>
+                    <div class="flex gap-sm">
+                        <input type="email" id="test_email_addr" placeholder="operator@sentinel.local" class="flex-1 bg-[#070b14] text-on-surface border border-outline-variant rounded p-xs text-xs font-label-mono"/>
+                        <button type="button" id="btn-test-email" class="bg-[#070b14] hover:bg-secondary-container hover:text-primary-container border border-outline-variant text-xs font-label-mono px-md py-1.5 rounded transition-all">
+                            SEND TEST EMAIL
+                        </button>
+                    </div>
+                </div>
+                <div id="email-test-feedback" class="hidden p-xs rounded text-[10px] font-label-mono text-center"></div>
+            </div>
+            {% endif %}
+
+            <!-- Submit Button Row -->
+            <div class="flex justify-end pt-md">
+                <button type="submit" class="bg-secondary-container text-primary-container px-lg py-2 rounded font-label-mono text-xs font-bold hover:shadow-[0_0_8px_#00e3fd] transition-all">
+                    SAVE SYSTEM CONFIGURATIONS
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnTest = document.getElementById("btn-test-email");
+        if (btnTest) {
+            btnTest.addEventListener("click", function() {
+                const emailInput = document.getElementById("test_email_addr");
+                const feedback = document.getElementById("email-test-feedback");
+                const email = emailInput.value.trim();
+                
+                if (!email) {
+                    feedback.className = "p-xs rounded text-[10px] font-label-mono text-center bg-error-container/20 text-error border border-error/30 mt-xs";
+                    feedback.innerText = "Please specify a recipient email address.";
+                    feedback.classList.remove("hidden");
+                    return;
+                }
+                
+                feedback.className = "p-xs rounded text-[10px] font-label-mono text-center bg-surface-container border border-outline-variant mt-xs";
+                feedback.innerText = "Dispatching test email... Please wait.";
+                feedback.classList.remove("hidden");
+                btnTest.disabled = true;
+
+                const formData = new FormData();
+                formData.append("email", email);
+                
+                fetch("{% url 'api_send_test_email' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    btnTest.disabled = false;
+                    if (data.status === "success") {
+                        feedback.className = "p-xs rounded text-[10px] font-label-mono text-center bg-green-950/40 text-green-400 border border-green-500/30 mt-xs";
+                        feedback.innerText = data.message;
+                    } else {
+                        feedback.className = "p-xs rounded text-[10px] font-label-mono text-center bg-error-container/20 text-error border border-error/30 mt-xs";
+                        feedback.innerText = data.message;
+                    }
+                })
+                .catch(err => {
+                    btnTest.disabled = false;
+                    feedback.className = "p-xs rounded text-[10px] font-label-mono text-center bg-error-container/20 text-error border border-error/30 mt-xs";
+                    feedback.innerText = "Network error occurred dispatching test email: " + err;
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}
