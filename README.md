@@ -140,58 +140,17 @@ All ingestion endpoints require JWT authentication. Ship payloads using a `Autho
 ### 1. JWT Authentication Pair
 * **Endpoint:** `POST /api/token/`
 * **Request Format:**
-```json
-{
-  "username": "agent_user",
-  "password": "agent_password_123"
-}
-```
-* **Response Format:**
-```json
-{
-  "refresh": "eyJhbGciOi...",
-  "access": "eyJhbGciOi..."
-}
-```
+
 
 ### 2. Process Telemetry Ingestion
 * **Endpoint:** `POST /api/telemetry/processes/`
 * **Request Format:**
-```json
-{
-  "processes": [
-    {
-      "pid": 4124,
-      "ppid": 1004,
-      "name": "cmd.exe",
-      "username": "DESKTOP-ABC\\SYSTEM",
-      "exe": "C:\\Windows\\System32\\cmd.exe",
-      "cmdline": "cmd.exe /c whoami",
-      "cpu_percent": 0.1,
-      "memory_percent": 0.5,
-      "sha256": "848adfa890e...",
-      "is_suspicious": true,
-      "suspicious_reason": "Process name matches blacklisted list"
-    }
-  ]
-}
-```
+
 
 ### 3. Service Status Ingestion
 * **Endpoint:** `POST /api/telemetry/services/`
 * **Request Format:**
-```json
-{
-  "services": [
-    {
-      "name": "WinDefend",
-      "display_name": "Windows Defender",
-      "status": "Running",
-      "start_type": "Automatic"
-    }
-  ]
-}
-```
+
 
 ---
 
