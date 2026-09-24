@@ -106,7 +106,7 @@ python seed_db.py
 python backend/manage.py runserver
 ```
 Navigate to `http://127.0.0.1:5000` and authenticate with:
-* **Admin User:** `admin` / `admin`
+* **Admin User:** `admin` / `admin_password_123`
 * **SOC Analyst User:** `analyst` / `analyst`
 * **Viewer User:** `viewer` / `viewer`
 
